@@ -98,8 +98,10 @@ const MainContainer = () => {
     if (!formData.timeZone) newErrors.timeZone = "Time zone is required";
     if (!formData.startTime) newErrors.startTime = "Start time is required";
     if (!formData.endTime) newErrors.endTime = "End time is required";
-    if (!formData.description) newErrors.description = "Description is required";
-    if (!formData.bannerimage) newErrors.bannerimage = "Banner image is required";
+    if (!formData.description)
+      newErrors.description = "Description is required";
+    if (!formData.bannerimage)
+      newErrors.bannerimage = "Banner image is required";
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
@@ -142,160 +144,157 @@ const MainContainer = () => {
                 : "focus:ring-blue-500"
             }`}
           />
-                     {errors.eventName && (
-              <p className="text-red-500 mt-1">{errors.eventName}</p>
-            )}
-          </div>
+        </div>
 
+        <div className="mb-6">
+          <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
+            Date & Time
+          </label>
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <input
+              type="date"
+              name="eventDate"
+              value={formData.eventDate}
+              onChange={handleChange}
+              className={`w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
+                errors.eventDate
+                  ? "border border-red-500 focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              }`}
+            />
+            <select
+              name="timeZone"
+              value={formData.timeZone}
+              onChange={(e) => {
+                setFormData({ ...formData, timeZone: e.target.value });
+                setSelectedTimeZone(e.target.value);
+              }}
+              className={`w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white outline-none ${
+                errors.timeZone
+                  ? "border border-red-500 focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              }`}
+            >
+              <option value="" disabled>
+                Select Time Zone
+              </option>
+              {timeZones.map((zone) => (
+                <option key={zone} value={zone}>
+                  {zone}
+                </option>
+              ))}
+            </select>
+            <input
+              type="time"
+              name="startTime"
+              value={formData.startTime}
+              onChange={handleChange}
+              placeholder="Start time"
+              className={`w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
+                errors.startTime
+                  ? "border border-red-500 focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              }`}
+            />
+            <input
+              type="time"
+              name="endTime"
+              value={formData.endTime}
+              onChange={handleChange}
+              placeholder="End time"
+              className={`w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
+                errors.endTime
+                  ? "border border-red-500 focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              }`}
+            />
+          </div>
           <div className="mb-6">
             <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
-              Date & Time
+              Description
             </label>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <input
-                type="date"
-                name="eventDate"
-                value={formData.eventDate}
-                onChange={handleChange}
-                className={`w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
-                  errors.eventDate
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "focus:ring-blue-500"
-                }`}
-              />
-              <select
-                name="timeZone"
-                value={formData.timeZone}
-                onChange={(e) => {
-                  setFormData({ ...formData, timeZone: e.target.value });
-                  setSelectedTimeZone(e.target.value);
-                }}
-                className={`w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white outline-none ${
-                  errors.timeZone
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "focus:ring-blue-500"
-                }`}
-              >
-                <option value="" disabled>
-                  Select Time Zone
-                </option>
-                {timeZones.map((zone) => (
-                  <option key={zone} value={zone}>
-                    {zone}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="time"
-                name="startTime"
-                value={formData.startTime}
-                onChange={handleChange}
-                placeholder="Start time"
-                className={`w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
-                  errors.startTime
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "focus:ring-blue-500"
-                }`}
-              />
-              <input
-                type="time"
-                name="endTime"
-                value={formData.endTime}
-                onChange={handleChange}
-                placeholder="End time"
-                className={`w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
-                  errors.endTime
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "focus:ring-blue-500"
-                }`}
-              />
-            </div>
-            <div className="mb-6">
-              <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Add event description..."
-                className={`w-full py-2 mt-2 px-4 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
-                  errors.description
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "focus:ring-blue-500"
-                }`}
-                rows="4"
-              ></textarea>
-            </div>
-            <div className="mb-6">
-              <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
-                Video
-              </label>
-              <div className="relative w-full mt-2">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i className="fa-solid fa-link text-gray-500 dark:text-gray-300"></i>
-                </div>
-                <input
-                  type="text"
-                  name="videoLink"
-                  value={formData.videoLink}
-                  onChange={handleChange}
-                  placeholder="Add video link..."
-                  className={`w-full py-2 pl-10 pr-4 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
-                    errors.videoLink
-                      ? "border border-red-500 focus:ring-red-500"
-                      : "focus:ring-blue-500"
-                  }`}
-                />
-              </div>
-            </div>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Add event description..."
+              className={`w-full py-2 mt-2 px-4 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
+                errors.description
+                  ? "border border-red-500 focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              }`}
+              rows="4"
+            ></textarea>
+          </div>
+          <div className="mb-6">
             <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
-              Banner Image
+              Video
             </label>
-            <div
-              className={`mb-8 mt-2 relative w-full h-64 border-2 ${
-                isDragging ? "border-blue-500" : "border-gray-300"
-              } border-dashed bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center cursor-pointer`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={handleClickUpload}
-            >
+            <div className="relative w-full mt-2">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="fa-solid fa-link text-gray-500 dark:text-gray-300"></i>
+              </div>
               <input
-                type="file"
-                ref={fileInputRef}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                accept="image/*"
-                onChange={handleFileChange}
+                type="text"
+                name="videoLink"
+                value={formData.videoLink}
+                onChange={handleChange}
+                placeholder="Add video link..."
+                className={`w-full py-2 pl-10 pr-4 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
+                  errors.videoLink
+                    ? "border border-red-500 focus:ring-red-500"
+                    : "focus:ring-blue-500"
+                }`}
               />
-              {!bannerImage ? (
-                <div className="text-center text-gray-500 dark:text-gray-300">
-                  <p>Click to upload or drag and drop</p>
-                  <p className="text-sm">
-                    SVG, PNG, JPG or GIF (recommended size 1024x1024px)
-                  </p>
-                </div>
-              ) : (
-                <img
-                  src={bannerImage}
-                  alt="Banner"
-                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                />
-              )}
-            </div>
-            <div>
-              <button
-                className="bg-[#00970016] dark:bg-[#70FE8C1B] text-[#006514D5] dark:text-[#89FF9FCD] py-2 px-6 rounded-lg transition"
-                onClick={handleSubmit}
-              >
-                Create event
-              </button>
-              <button className="bg-inherit dark:bg-inherit dark:text-[#AFB5AD] text-[#60655F] py-2 px-6 ml-5 rounded-lg transition">
-                Cancel
-              </button>
             </div>
           </div>
+          <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
+            Banner Image
+          </label>
+          <div
+            className={`mb-8 mt-2 relative w-full h-64 border-2 ${
+              isDragging ? "border-blue-500" : "border-gray-300"
+            } border-dashed bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center cursor-pointer`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={handleClickUpload}
+          >
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            {!bannerImage ? (
+              <div className="text-center text-gray-500 dark:text-gray-300">
+                <p>Click to upload or drag and drop</p>
+                <p className="text-sm">
+                  SVG, PNG, JPG or GIF (recommended size 1024x1024px)
+                </p>
+              </div>
+            ) : (
+              <img
+                src={bannerImage}
+                alt="Banner"
+                className="absolute inset-0 w-full h-full object-cover rounded-lg"
+              />
+            )}
+          </div>
+          <div>
+            <button
+              className="bg-[#00970016] dark:bg-[#70FE8C1B] text-[#006514D5] dark:text-[#89FF9FCD] py-2 px-6 rounded-lg transition"
+              onClick={handleSubmit}
+            >
+              Create event
+            </button>
+            <button className="bg-inherit dark:bg-inherit dark:text-[#AFB5AD] text-[#60655F] py-2 px-6 ml-5 rounded-lg transition">
+              Cancel
+            </button>
+          </div>
         </div>
+      </div>
     </main>
   );
 };
