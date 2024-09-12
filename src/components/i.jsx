@@ -5,10 +5,6 @@ const MainContainer = () => {
   const [selectedTimeZone, setSelectedTimeZone] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [imageDetails, setImageDetails] = useState({
-    title: "",
-    size: "",
-  });
   const [formData, setFormData] = useState({
     eventName: "",
     eventDate: "",
@@ -42,10 +38,6 @@ const MainContainer = () => {
         setFormData({
           ...formData,
           bannerimage: file.name,
-        });
-        setImageDetails({
-          title: file.name,
-          size: `${(file.size / 1024).toFixed(2)} KB`,
         });
       };
       reader.readAsDataURL(file);
@@ -100,34 +92,6 @@ const MainContainer = () => {
     e.preventDefault();
     const newErrors = {};
 
-    // Get current date and time
-    const now = new Date();
-
-    // Check if the event date is in the past
-    const eventDate = new Date(formData.eventDate);
-    if (eventDate < now) {
-      newErrors.eventDate = "Event date cannot be in the past";
-    }
-
-    // Check if the start time is in the past
-    const eventStartTime = new Date(
-      `${formData.eventDate}T${formData.startTime}`
-    );
-    if (eventStartTime < now) {
-      newErrors.startTime = "Start time cannot be in the past";
-    }
-
-    // Check if the end time is in the past
-    const eventEndTime = new Date(`${formData.eventDate}T${formData.endTime}`);
-    if (eventEndTime < now) {
-      newErrors.endTime = "End time cannot be in the past";
-    }
-
-    // Ensure end time is not before start time
-    if (eventStartTime >= eventEndTime) {
-      newErrors.endTime = "End time must be after start time";
-    }
-
     // Form Validation
     if (!formData.eventName) newErrors.eventName = "Event name is required";
     if (!formData.eventDate) newErrors.eventDate = "Event date is required";
@@ -139,28 +103,10 @@ const MainContainer = () => {
     if (!formData.bannerimage)
       newErrors.bannerimage = "Banner image is required";
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return; // Stop further execution if there are validation errors
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
+      console.log("Form submitted", formData);
     }
-
-    // If no errors, submit the form
-    console.log("Form submitted", formData);
-
-    // Clear form data and other states after successful submission
-    setFormData({
-      eventName: "",
-      eventDate: "",
-      timeZone: "",
-      startTime: "",
-      endTime: "",
-      description: "",
-      bannerimage: "",
-      videoLink: "",
-    });
-    setBannerImage(null);
-    setImageDetails({ title: "", size: "" });
-    setErrors({}); // Clear any existing errors
   };
 
   // Handle Image Removal
@@ -288,6 +234,7 @@ const MainContainer = () => {
               }`}
             />
           </div>
+
           <div className="mb-6">
             <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
               Description
@@ -305,53 +252,23 @@ const MainContainer = () => {
               rows="4"
             ></textarea>
           </div>
-          <div className="mb-6">
-            <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
-              Video
-            </label>
-            <div className="relative w-full mt-2">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i className="fa-solid fa-link text-gray-500 dark:text-gray-300"></i>
-              </div>
-              <input
-                type="text"
-                name="videoLink"
-                value={formData.videoLink}
-                onChange={handleChange}
-                placeholder="Add video link..."
-                className={`w-full py-2 pl-10 pr-4 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none ${
-                  errors.videoLink
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "focus:ring-blue-500"
-                }`}
-              />
-            </div>
-          </div>
-          <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
-            Banner Image
-          </label>
+
+          {/* Drag and Drop Section */}
           <div
-            className={`mb-8 mt-2 relative w-full h-64 border-2 ${
-              isDragging ? "border-blue-500" : "border-gray-300"
-            } border-dashed bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center cursor-pointer`}
+            className={`mb-6 p-6 border-2 border-dashed rounded-lg ${
+              isDragging
+                ? "border-blue-500 dark:border-blue-300"
+                : "border-gray-300 dark:border-gray-500"
+            }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={handleClickUpload}
           >
             <p className="text-center text-gray-500 dark:text-gray-300">
-              {isDragging ? (
-                "Drop the image here"
-              ) : (
-                <>
-                  <div className="text-center text-gray-500 dark:text-gray-300">
-                    <p>Click to upload or drag and drop</p>
-                    <p className="text-sm">
-                      SVG, PNG, JPG or GIF (recommended size 1024x1024px)
-                    </p>
-                  </div>
-                </>
-              )}
+              {isDragging
+                ? "Drop the image here"
+                : "Drag and drop a banner image, or click to select"}
             </p>
             <input
               type="file"
@@ -360,51 +277,51 @@ const MainContainer = () => {
               className="hidden"
             />
           </div>
+
+          {/* Preview Image Under Drag and Drop */}
           {bannerImage && (
-            <div className="mb-4 p-3">
-              <div className="flex items-center">
-                <img
-                  src={bannerImage}
-                  alt="Banner Preview"
-                  className="w-20 h-20 object-cover rounded-md mr-4"
-                />
-                <div className="flex flex-col">
-                  <svg
-                    onClick={handleRemoveImage}
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 448 512"
-                    className="w-6 h-4 text-red-500"
-                  >
-                    <path
-                      d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  <div>
-                    <p className="text-gray-800 dark:text-white font-semibold">
-                      {imageDetails.title}{" "}
-                    </p>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">
-                      {imageDetails.size}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <div className="mb-4">
+              <img
+                src={bannerImage}
+                alt="Banner Preview"
+                className="w-full h-auto rounded-lg"
+              />
+              <button onClick={handleRemoveImage} className="text-red-500 mt-2">
+                Remove Image
+              </button>
             </div>
           )}
 
-          <div>
+          {/* Video Link */}
+          <div className="mb-6">
+            <label className="block text-[#1D211C] dark:text-[#FFFFFF] mb-2">
+              Video Link
+            </label>
+            <input
+              type="text"
+              name="videoLink"
+              value={formData.videoLink}
+              onChange={handleChange}
+              placeholder="Add a video link (optional)"
+              className="w-full py-2 px-4 mt-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 outline-none focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end">
             <button
-              className="bg-[#00970016] dark:bg-[#70FE8C1B] text-[#006514D5] dark:text-[#89FF9FCD] py-2 px-6 rounded-lg transition"
-              onClick={handleSubmit}
-            >
-              Create event
-            </button>
-            <button
-              className="bg-inherit dark:bg-inherit dark:text-[#AFB5AD] text-[#60655F] py-2 px-6 ml-5 rounded-lg transition"
+              type="button"
+              className="py-2 px-4 bg-red-500 text-white rounded-lg mr-2"
               onClick={handleCancel}
             >
               Cancel
+            </button>
+            <button
+              type="submit"
+              className="py-2 px-4 bg-blue-500 text-white rounded-lg"
+              onClick={handleSubmit}
+            >
+              Create Event
             </button>
           </div>
         </div>
