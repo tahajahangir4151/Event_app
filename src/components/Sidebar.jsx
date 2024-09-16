@@ -1,47 +1,78 @@
-import React, { useState } from "react";
+import React from "react";
+import eventImage from "../images/Event image.jpg";
 import { Link } from "react-router-dom";
-import viperRoomImg from "../images/viperRoom.avif";
-import jasonImg from "../images/Jason+Isbell+Southeastern+Reissue.jpg";
-import trobadorImg from "../images/trobadour.jpg";
 
-const Sidebar = ({ toggleDarkMode, darkMode }) => {
-  const [activeItem, setActiveItem] = useState("Dashboard");
+const Sidebar = ({ darkMode, toggleDarkMode, isDrawerOpen, closeDrawer }) => {
+  const [activeItem, setActiveItem] = React.useState("Dashboard");
+  const [todayEvents, setTodayEvents] = React.useState([]);
 
-  // Menu items with route paths
   const menuItems = [
-    { name: "Dashboard", icon: "fas fa-th-large" },
-    { name: "Calendar", icon: "fas fa-calendar" },
-    { name: "Events", icon: "fas fa-bookmark" },
-    { name: "Offers & Deals", icon: "fas fa-briefcase" },
-    { name: "Settings", icon: "fas fa-sliders-h" },
+    { name: "Dashboard", icon: "fas fa-th-large", path: "/" },
+    { name: "Calendar", icon: "fas fa-calendar", path: "/calender" },
+    { name: "Events", icon: "fas fa-bookmark", path: "/events" },
+    { name: "Offers & Deals", icon: "fas fa-briefcase", path: "/deals" },
+    { name: "Settings", icon: "fas fa-sliders-h", path: "/settings" },
   ];
 
-  // Handle the active menu item
   const handleItemClick = (item) => {
     setActiveItem(item);
+    closeDrawer();
   };
 
+  const fetchEvents = () => {
+    const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+    const today = new Date().toISOString().split("T")[0];
+    const eventsToday = storedEvents.filter(
+      (event) => event.eventDate === today
+    );
+    setTodayEvents(eventsToday);
+  };
+
+  React.useEffect(() => {
+    fetchEvents();
+
+    const handleStorageChange = (e) => {
+      if (e.storageArea === localStorage) {
+        fetchEvents();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   return (
-    <aside className="w-64 bg-white dark:bg-gray-800 p-6 flex flex-col min-h-screen justify-between">
+    <aside
+      className={`fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 p-6 flex flex-col min-h-screen justify-between transform ${
+        isDrawerOpen ? "translate-x-0" : "-translate-x-full"
+      } transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:w-64`}
+    >
+      <button
+        onClick={closeDrawer}
+        className="lg:hidden absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+      >
+        <i className="fas fa-times"></i>
+      </button>
       <div>
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-8 flex items-center">
           <i className="fas fa-cog mr-2"></i>ShowOps
         </h2>
 
-        {/* Navigation Menu */}
         <nav>
           <ul>
             {menuItems.map((item) => (
               <li key={item.name} className="mb-4">
                 <Link
-                  //   to={item.path}
                   onClick={() => handleItemClick(item.name)}
-                  className={`flex items-center text-[#040E0082] dark:text-gray-300 p-2  rounded-lg 
-                    ${
-                      activeItem === item.name
-                        ? "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
-                        : "hover:bg-gray-200 dark:hover:bg-gray-700"
-                    }`}
+                  to={item.path}
+                  className={`flex items-center text-[#040E0082] dark:text-gray-300 p-2 rounded-lg ${
+                    activeItem === item.name
+                      ? "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
+                      : "hover:bg-gray-200 dark:hover:bg-gray-700"
+                  }`}
                 >
                   <i className={`${item.icon} mr-3`}></i>
                   {item.name}
@@ -51,65 +82,39 @@ const Sidebar = ({ toggleDarkMode, darkMode }) => {
           </ul>
         </nav>
 
-        {/* Today Events Section  */}
         <div className="mt-8">
           <h3 className="text-[#040E0082] dark:text-gray-400 mb-4 font-bold">
             Today's Event
           </h3>
           <div className="space-y-6">
-            <div className="items-center flex space-x-4">
-              <div className="flex items-center space-x-4">
-                <img
-                  //   src="https://via.placeholder.com/40"
-                  src={viperRoomImg}
-                  alt="The Viper Room"
-                  className="w-10 h-10 rounded-lg"
-                />
-                <div>
-                  <span className="block text-[#1D211C] dark:text-white">
-                    Tourist
-                  </span>
-                  <span className="block text-[#1D211C] font-[630] dark:text-white">
-                    The Viper Room
-                  </span>
+            {todayEvents.length > 0 ? (
+              todayEvents.map((event, index) => (
+                <div key={index} className="items-center flex space-x-4">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={eventImage}
+                      alt={event.eventName}
+                      className="w-10 h-10 rounded-lg"
+                    />
+                    <div>
+                      <span className="block text-[#1D211C] dark:text-white">
+                        {event.eventName}
+                      </span>
+                      <span className="block text-[#1D211C] font-[630] dark:text-white">
+                        {event.description}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <img
-                // src="https://via.placeholder.com/40"
-                src={jasonImg}
-                alt="The Wiltern"
-                className="w-10 h-10 rounded-lg"
-              />
-              <div>
-                <span className="block  text-[#1D211C] dark:text-white">
-                  Jason Isbell
-                </span>
-                <span className="block  text-[#1D211C] font-[630] dark:text-white">
-                  The Wiltern
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <img
-                // src="https://via.placeholder.com/40"
-                src={trobadorImg}
-                alt="The Troubadour"
-                className="w-10 h-10 rounded-lg"
-              />
-              <div>
-                <span className="block  text-[#1D211C] dark:text-white">
-                  Brenn!
-                </span>
-                <span className="block  text-[#1D211C] font-[630] dark:text-white">
-                  The Troubadour
-                </span>
-              </div>
-            </div>
+              ))
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">
+                No events for today.
+              </p>
+            )}
           </div>
         </div>
-        {/* Footer section  */}
+
         <div className="mt-8">
           <label className="flex items-center relative cursor-pointer">
             <input
@@ -134,7 +139,7 @@ const Sidebar = ({ toggleDarkMode, darkMode }) => {
             <span className="ml-3 text-gray-600 dark:text-white">
               {darkMode ? "Light Mode" : "Dark Mode"}
             </span>
-          </label>{" "}
+          </label>
           <div className="mt-10 text-gray-600 dark:text-gray-400">
             <Link className="block text-sm text-[#006514D5] font-[500]">
               Terms of Use

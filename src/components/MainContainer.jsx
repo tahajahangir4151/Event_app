@@ -100,34 +100,6 @@ const MainContainer = () => {
     e.preventDefault();
     const newErrors = {};
 
-    // Get current date and time
-    const now = new Date();
-
-    // Check if the event date is in the past
-    const eventDate = new Date(formData.eventDate);
-    if (eventDate < now) {
-      newErrors.eventDate = "Event date cannot be in the past";
-    }
-
-    // Check if the start time is in the past
-    const eventStartTime = new Date(
-      `${formData.eventDate}T${formData.startTime}`
-    );
-    if (eventStartTime < now) {
-      newErrors.startTime = "Start time cannot be in the past";
-    }
-
-    // Check if the end time is in the past
-    const eventEndTime = new Date(`${formData.eventDate}T${formData.endTime}`);
-    if (eventEndTime < now) {
-      newErrors.endTime = "End time cannot be in the past";
-    }
-
-    // Ensure end time is not before start time
-    if (eventStartTime >= eventEndTime) {
-      newErrors.endTime = "End time must be after start time";
-    }
-
     // Form Validation
     if (!formData.eventName) newErrors.eventName = "Event name is required";
     if (!formData.eventDate) newErrors.eventDate = "Event date is required";
@@ -141,8 +113,15 @@ const MainContainer = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      return; // Stop further execution if there are validation errors
+      return; 
     }
+    const eventId = Date.now().toString();
+    const event = { ...formData, eventId };
+    const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+    const updatedEvents = [...storedEvents, event];
+    localStorage.setItem("events", JSON.stringify(updatedEvents));
+
+    console.log("Form submitted", formData);
 
     // If no errors, submit the form
     console.log("Form submitted", formData);
