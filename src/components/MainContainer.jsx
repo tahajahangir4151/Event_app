@@ -49,7 +49,7 @@ const MainContainer = () => {
   // Fetch Time Zone
   useEffect(() => {
     const fetchTimeZone = async () => {
-      const response = await fetch("http://worldtimeapi.org/api/timezone");
+      const response = await fetch("https://worldtimeapi.org/api/timezone");
       const data = await response.json();
       setTimeZones(data);
     };
