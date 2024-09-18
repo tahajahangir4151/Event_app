@@ -1,8 +1,9 @@
 import React from "react";
 import eventImage from "../images/Event image.jpg";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = ({ darkMode, toggleDarkMode, isDrawerOpen, closeDrawer }) => {
+  const location = useLocation();
   const [activeItem, setActiveItem] = React.useState("Dashboard");
   const [todayEvents, setTodayEvents] = React.useState([]);
 
@@ -13,6 +14,14 @@ const Sidebar = ({ darkMode, toggleDarkMode, isDrawerOpen, closeDrawer }) => {
     { name: "Offers & Deals", icon: "fas fa-briefcase", path: "/deals" },
     { name: "Settings", icon: "fas fa-sliders-h", path: "/settings" },
   ];
+
+  React.useEffect(() => {
+    const currentPath = location.pathname;
+    const activeMenuItem = menuItems.find((item) => item.path === currentPath);
+    if (activeMenuItem) {
+      setActiveItem(activeMenuItem.name);
+    }
+  }, [location.pathname]);
 
   const handleItemClick = (item) => {
     setActiveItem(item);
@@ -46,16 +55,10 @@ const Sidebar = ({ darkMode, toggleDarkMode, isDrawerOpen, closeDrawer }) => {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 p-6 flex flex-col min-h-screen justify-between transform ${
+      className={`fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 p-6 flex flex-col min-h-screen justify-between z-50 transform ${
         isDrawerOpen ? "translate-x-0" : "-translate-x-full"
       } transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:w-64`}
     >
-      <button
-        onClick={closeDrawer}
-        className="lg:hidden absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-      >
-        <i className="fas fa-times"></i>
-      </button>
       <div>
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-8 flex items-center">
           <i className="fas fa-cog mr-2"></i>ShowOps
