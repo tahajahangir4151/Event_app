@@ -61,7 +61,6 @@ const Login = ({
     }
 
     setLoggedIn(true);
-    // Store user info in localStorage
     const userInfo = { email, password };
     localStorage.setItem("userInfo", JSON.stringify(userInfo));
     setEmail(email);

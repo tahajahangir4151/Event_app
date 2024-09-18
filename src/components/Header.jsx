@@ -57,11 +57,9 @@ const Header = ({
           <div className="relative">
             <button
               onClick={handleProfileIconClick}
-              className="flex items-center space-x-2 ml-5"
+              className="flex items-center justify-center w-full max-w-[48px] h-10 text-xl bg-purple-500 text-white rounded-full p-2 flex-shrink-0 ml-5"
             >
-              <div className="bg-purple-500 text-white rounded-full p-2 flex items-center justify-center text-xl">
-                {email[0].toUpperCase()}
-              </div>
+              {email[0].toUpperCase()}
             </button>
             {showLogoutMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg">

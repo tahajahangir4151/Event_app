@@ -6,6 +6,7 @@ import MainContainer from "../components/MainContainer";
 import Calender from "./Calender";
 import Events from "./Events";
 import Login from "../components/authentication/Login";
+import EventDetail from "./EventDetail";
 
 const Home = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -63,6 +64,7 @@ const Home = () => {
                   />
                 }
               />
+              <Route path="/view-event/:eventId" element={<EventDetail />} />
             </Routes>
           </main>
         </div>

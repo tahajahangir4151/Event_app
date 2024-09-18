@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 const MainContainer = () => {
   const [timeZones, setTimeZones] = useState([]);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [selectedTimeZone, setSelectedTimeZone] = useState("");
   const [bannerImage, setBannerImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [imageDetails, setImageDetails] = useState({
     title: "",
     size: "",
@@ -20,7 +23,28 @@ const MainContainer = () => {
     videoLink: "",
   });
   const [errors, setErrors] = useState({});
+  const location = useLocation()
   const fileInputRef = useRef(null);
+
+  //Populate form data if it is in edit mode
+ useEffect(() => {
+   if (location.state && location.state.event) {
+     const event = location.state.event;
+     setFormData({
+       eventId: event.eventId || "", 
+       eventName: event.eventName || "",
+       eventDate: event.eventDate || "",
+       timeZone: event.timeZone || "",
+       startTime: event.startTime || "",
+       endTime: event.endTime || "",
+       description: event.description || "",
+       bannerimage: event.bannerimage || "",
+       videoLink: event.videoLink || "",
+     });
+     setBannerImage(event.bannerimage || "");
+     setIsEditMode(true);
+   }
+ }, [location.state]);
 
   // Fetch Time Zone
   useEffect(() => {
@@ -33,24 +57,54 @@ const MainContainer = () => {
   }, []);
 
   // Handle File Input Change
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setBannerImage(e.target.result);
+      setLoading(true);
+      const uploadResult = await uploadImageToCloudinary(file);
+      setLoading(false);
+      if (uploadResult && uploadResult.secure_url) {
+        const imageUrl = uploadResult.secure_url;
+        setBannerImage(imageUrl);
         setFormData({
           ...formData,
-          bannerimage: file.name,
+          bannerimage: imageUrl,
         });
         setImageDetails({
           title: file.name,
           size: `${(file.size / 1024).toFixed(2)} KB`,
         });
-      };
-      reader.readAsDataURL(file);
-      // Clear the input value
-      event.target.value = "";
+      } else {
+        console.error("Image upload failed");
+      }
+    }
+  };
+
+  // Upload Image to Cloudinary
+  const uploadImageToCloudinary = async (file) => {
+    const uploadPreset = "Talk-A-Tive app";
+    const cloudinaryUrl =
+      "https://api.cloudinary.com/v1_1/dnaa1baqk/image/upload";
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    try {
+      const response = await fetch(cloudinaryUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const data = await response.json();
+      return data; 
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
     }
   };
 
@@ -65,20 +119,24 @@ const MainContainer = () => {
     setIsDragging(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setBannerImage(e.target.result);
+      setLoading(true);
+      const uploadResult = await uploadImageToCloudinary(file);
+      setLoading(false);
+      if (uploadResult && uploadResult.secure_url) {
+        const imageUrl = uploadResult.secure_url;
+        setBannerImage(imageUrl);
         setFormData({
           ...formData,
-          bannerimage: file.name,
+          bannerimage: imageUrl,
         });
-      };
-      reader.readAsDataURL(file);
+      } else {
+        console.error("Image upload failed");
+      }
     }
   };
 
@@ -95,52 +153,59 @@ const MainContainer = () => {
     });
   };
 
-  // Handle Form Submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = {};
+ const handleSubmit = (e) => {
+   e.preventDefault();
+   if (loading) return;
+   const newErrors = {};
 
-    // Form Validation
-    if (!formData.eventName) newErrors.eventName = "Event name is required";
-    if (!formData.eventDate) newErrors.eventDate = "Event date is required";
-    if (!formData.timeZone) newErrors.timeZone = "Time zone is required";
-    if (!formData.startTime) newErrors.startTime = "Start time is required";
-    if (!formData.endTime) newErrors.endTime = "End time is required";
-    if (!formData.description)
-      newErrors.description = "Description is required";
-    if (!formData.bannerimage)
-      newErrors.bannerimage = "Banner image is required";
+   // Form Validation
+   if (!formData.eventName) newErrors.eventName = "Event name is required";
+   if (!formData.eventDate) newErrors.eventDate = "Event date is required";
+   if (!formData.timeZone) newErrors.timeZone = "Time zone is required";
+   if (!formData.startTime) newErrors.startTime = "Start time is required";
+   if (!formData.endTime) newErrors.endTime = "End time is required";
+   if (!formData.description) newErrors.description = "Description is required";
+   if (!formData.bannerimage)
+     newErrors.bannerimage = "Banner image is required";
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return; 
-    }
-    const eventId = Date.now().toString();
-    const event = { ...formData, eventId };
-    const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
-    const updatedEvents = [...storedEvents, event];
-    localStorage.setItem("events", JSON.stringify(updatedEvents));
+   if (Object.keys(newErrors).length > 0) {
+     setErrors(newErrors);
+     return;
+   }
 
-    console.log("Form submitted", formData);
+   if (isEditMode) {
+     // Update existing event
+     const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+     const updatedEvents = storedEvents.map((event) =>
+       event.eventId === formData.eventId ? formData : event
+     );
+     localStorage.setItem("events", JSON.stringify(updatedEvents));
+     console.log("Event updated", formData);
+   } else {
+     // Create new event
+     const eventId = Date.now().toString();
+     const newEvent = { ...formData, eventId };
+     const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+     const updatedEvents = [...storedEvents, newEvent];
+     localStorage.setItem("events", JSON.stringify(updatedEvents));
+     console.log("Event created", formData);
+   }
 
-    // If no errors, submit the form
-    console.log("Form submitted", formData);
-
-    // Clear form data and other states after successful submission
-    setFormData({
-      eventName: "",
-      eventDate: "",
-      timeZone: "",
-      startTime: "",
-      endTime: "",
-      description: "",
-      bannerimage: "",
-      videoLink: "",
-    });
-    setBannerImage(null);
-    setImageDetails({ title: "", size: "" });
-    setErrors({}); // Clear any existing errors
-  };
+   // Clear form data and other states after successful submission
+   setFormData({
+     eventName: "",
+     eventDate: "",
+     timeZone: "",
+     startTime: "",
+     endTime: "",
+     description: "",
+     bannerimage: "",
+     videoLink: "",
+   });
+   setBannerImage(null);
+   setImageDetails({ title: "", size: "" });
+   setErrors({}); 
+ };
 
   // Handle Image Removal
   const handleRemoveImage = () => {
@@ -163,7 +228,7 @@ const MainContainer = () => {
       bannerimage: "",
       videoLink: "",
     });
-    setBannerImage(null); // Clear banner image
+    setBannerImage(null); 
     setErrors({});
   };
 
@@ -172,7 +237,7 @@ const MainContainer = () => {
       <div className="bg-white dark:bg-gray-800 px-8 py-6 rounded-lg shadow-lg max-w-2xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
-            Create an event
+            {isEditMode ? "Update Event" : "Create an event"}
           </h1>
           {/* Error Banner */}
           {Object.keys(errors).length > 0 && (
@@ -376,8 +441,18 @@ const MainContainer = () => {
             <button
               className="bg-[#00970016] dark:bg-[#70FE8C1B] text-[#006514D5] dark:text-[#89FF9FCD] py-2 px-6 rounded-lg transition"
               onClick={handleSubmit}
+              disabled={loading}
             >
-              Create event
+              {loading ? (
+                <div className="flex items-center">
+                  <i className="fa-solid fa-spinner animate-spin mr-2"></i>
+                  Uploading...
+                </div>
+              ) : isEditMode ? (
+                "Update Event"
+              ) : (
+                "Create Event"
+              )}
             </button>
             <button
               className="bg-inherit dark:bg-inherit dark:text-[#AFB5AD] text-[#60655F] py-2 px-6 ml-5 rounded-lg transition"

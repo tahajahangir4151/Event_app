@@ -95,9 +95,9 @@ const Sidebar = ({ darkMode, toggleDarkMode, isDrawerOpen, closeDrawer }) => {
                 <div key={index} className="items-center flex space-x-4">
                   <div className="flex items-center space-x-4">
                     <img
-                      src={eventImage}
+                      src={event.bannerimage}
                       alt={event.eventName}
-                      className="w-10 h-10 rounded-lg"
+                      className="w-10 h-10 rounded-lg "
                     />
                     <div>
                       <span className="block text-[#1D211C] dark:text-white">
