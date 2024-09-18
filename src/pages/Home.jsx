@@ -49,7 +49,7 @@ const Home = () => {
           <main>
             <Routes>
               <Route path="/" element={<MainContainer />} />
-              <Route path="/calender" element={<Calender />} />
+              <Route path="/Calender" element={<Calender />} />
               <Route path="/events" element={<Events />} />
               <Route
                 path="/login"
