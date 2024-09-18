@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Routes, Route , Switch } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import MainContainer from "../components/MainContainer";
@@ -48,25 +48,23 @@ const Home = () => {
           />
           <main>
             <Routes>
-              <Switch>
-                <Route exact path="/" element={<MainContainer />} />
-                <Route path="/calender" element={<Calender />} />
-                <Route path="/events" element={<Events />} />
-                <Route
-                  path="/login"
-                  element={
-                    <Login
-                      email={email}
-                      setEmail={setEmail}
-                      password={password}
-                      setPassword={setPassword}
-                      loggedIn={loggedIn}
-                      setLoggedIn={setLoggedIn}
-                    />
-                  }
-                />
-                <Route path="/view-event/:eventId" element={<EventDetail />} />
-              </Switch>
+              <Route path="/" element={<MainContainer />} />
+              <Route path="/calender" element={<Calender />} />
+              <Route path="/events" element={<Events />} />
+              <Route
+                path="/login"
+                element={
+                  <Login
+                    email={email}
+                    setEmail={setEmail}
+                    password={password}
+                    setPassword={setPassword}
+                    loggedIn={loggedIn}
+                    setLoggedIn={setLoggedIn}
+                  />
+                }
+              />
+              <Route path="/view-event/:eventId" element={<EventDetail />} />
             </Routes>
           </main>
         </div>
