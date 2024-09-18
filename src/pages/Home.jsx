@@ -48,23 +48,25 @@ const Home = () => {
           />
           <main>
             <Routes>
-              <Route path="/" element={<MainContainer />} />
-              <Route path="/calender" element={<Calender />} />
-              <Route path="/events" element={<Events />} />
-              <Route
-                path="/login"
-                element={
-                  <Login
-                    email={email}
-                    setEmail={setEmail}
-                    password={password}
-                    setPassword={setPassword}
-                    loggedIn={loggedIn}
-                    setLoggedIn={setLoggedIn}
-                  />
-                }
-              />
-              <Route path="/view-event/:eventId" element={<EventDetail />} />
+              <Switch>
+                <Route exact path="/" element={<MainContainer />} />
+                <Route path="/calender" element={<Calender />} />
+                <Route path="/events" element={<Events />} />
+                <Route
+                  path="/login"
+                  element={
+                    <Login
+                      email={email}
+                      setEmail={setEmail}
+                      password={password}
+                      setPassword={setPassword}
+                      loggedIn={loggedIn}
+                      setLoggedIn={setLoggedIn}
+                    />
+                  }
+                />
+                <Route path="/view-event/:eventId" element={<EventDetail />} />
+              </Switch>
             </Routes>
           </main>
         </div>
