@@ -50,9 +50,9 @@ const Home = () => {
             <Routes>
               <Route path="/" element={<MainContainer />} />
               <Route path="/Calender" element={<Calender />} />
-              <Route path="/events" element={<Events />} />
+              <Route path="/Events" element={<Events />} />
               <Route
-                path="/login"
+                path="/Login"
                 element={
                   <Login
                     email={email}

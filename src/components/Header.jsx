@@ -16,7 +16,7 @@ const Header = ({
 
   const handleLogout = () => {
     if (!loggedIn) {
-      navigate("/login");
+      navigate("/Login");
       toast.warn("You are not logged in");
     } else {
       setLoggedIn(false);
@@ -33,7 +33,7 @@ const Header = ({
     if (loggedIn) {
       setShowLogoutMenu((prev) => !prev);
     } else {
-      navigate("/login");
+      navigate("/Login");
     }
   };
 
@@ -73,7 +73,7 @@ const Header = ({
             )}
           </div>
         ) : (
-          <Link to="/login">
+          <Link to="/Login">
             <button className="text-gray-600 ml-5 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors duration-300 flex items-center space-x-2">
               <i className="fa-solid fa-user-circle text-xl"></i>
             </button>

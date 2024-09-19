@@ -10,9 +10,9 @@ const Sidebar = ({ darkMode, toggleDarkMode, isDrawerOpen, closeDrawer }) => {
   const menuItems = [
     { name: "Dashboard", icon: "fas fa-th-large", path: "/" },
     { name: "Calendar", icon: "fas fa-calendar", path: "/Calender" },
-    { name: "Events", icon: "fas fa-bookmark", path: "/events" },
-    { name: "Offers & Deals", icon: "fas fa-briefcase", path: "/deals" },
-    { name: "Settings", icon: "fas fa-sliders-h", path: "/settings" },
+    { name: "Events", icon: "fas fa-bookmark", path: "/Events" },
+    { name: "Offers & Deals", icon: "fas fa-briefcase", path: "/Deals" },
+    { name: "Settings", icon: "fas fa-sliders-h", path: "/Settings" },
   ];
 
   React.useEffect(() => {

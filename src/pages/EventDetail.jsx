@@ -17,22 +17,32 @@ const EventDetail = () => {
   }, [location.state, navigate]);
 
   useEffect(() => {
-    if (event && event.eventDate) {
+    if (event && event.eventDate && event.startTime && event.endTime) {
       const updateRemainingTime = () => {
         const now = new Date();
         const eventDate = new Date(event.eventDate);
-        const difference = differenceInMilliseconds(eventDate, now);
-        const duration = intervalToDuration({ start: now, end: eventDate });
+        const startDateTime = new Date(`${event.eventDate} ${event.startTime}`);
+        const endDateTime = new Date(`${event.eventDate} ${event.endTime}`);
 
-        if (difference > 0) {
+        if (now < startDateTime) {
+          // Event has not started yet
+          const difference = differenceInMilliseconds(startDateTime, now);
+          const duration = intervalToDuration({
+            start: now,
+            end: startDateTime,
+          });
           const { days, hours, minutes, seconds } = duration;
           setRemainingTime(
             `${
               days > 0 ? `${days} days ` : ""
             }${hours} hours ${minutes} minutes ${seconds} seconds`
           );
+        } else if (now >= startDateTime && now <= endDateTime) {
+          // Event is ongoing
+          setRemainingTime("The event is ongoing!");
         } else {
-          setRemainingTime("The event has started!");
+          // Event has ended
+          setRemainingTime("The event has ended!");
         }
       };
 
